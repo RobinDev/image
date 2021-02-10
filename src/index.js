@@ -146,7 +146,6 @@ export default class ImageTool {
       api,
       config: this.config,
       onSelectFile: () => {
-        console.log(this.config);
         if (this.config.onSelectFile) {
           this.config.onSelectFile(this);
         } else {
