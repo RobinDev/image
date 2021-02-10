@@ -114,7 +114,10 @@ export default class ImageTool {
      */
     this.config = {
       endpoints: config.endpoints || '',
-      pattern: config.pattern || /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
+      onSelectFile: config.onSelectFile || '',
+      pattern: config.pattern
+        ? config.pattern
+        : /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
       additionalRequestData: config.additionalRequestData || {},
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
@@ -143,6 +146,7 @@ export default class ImageTool {
       api,
       config: this.config,
       onSelectFile: () => {
+        console.log(this.config);
         if (this.config.onSelectFile) {
           this.config.onSelectFile(this);
         } else {
@@ -235,7 +239,10 @@ export default class ImageTool {
       /**
        * Paste URL of image into the Editor
        */
-      patterns: { image: this.config.pattern },
+      patterns: {
+        image: /(https?:\/\/|\/media\/default\/)\S+\.(gif|jpe?g|tiff|png)$/i,
+      },
+      //patterns: { image: this.config.pattern },
 
       /**
        * Drag n drop file from into the Editor
