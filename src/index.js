@@ -114,11 +114,14 @@ export default class ImageTool {
      */
     this.config = {
       endpoints: config.endpoints || '',
+      pattern: config.pattern || /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
       additionalRequestData: config.additionalRequestData || {},
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || 'image',
       types: config.types || 'image/*',
-      captionPlaceholder: this.api.i18n.t(config.captionPlaceholder || 'Caption'),
+      captionPlaceholder: this.api.i18n.t(
+        config.captionPlaceholder || 'Caption'
+      ),
       buttonContent: config.buttonContent || '',
       uploader: config.uploader || undefined,
       actions: config.actions || [],
@@ -140,11 +143,15 @@ export default class ImageTool {
       api,
       config: this.config,
       onSelectFile: () => {
-        this.uploader.uploadSelectedFile({
-          onPreview: (src) => {
-            this.ui.showPreloader(src);
-          },
-        });
+        if (this.config.onSelectFile) {
+          this.config.onSelectFile(this);
+        } else {
+          this.uploader.uploadSelectedFile({
+            onPreview: (src) => {
+              this.ui.showPreloader(src);
+            },
+          });
+        }
       },
       readOnly,
     });
@@ -223,20 +230,18 @@ export default class ImageTool {
       /**
        * Paste HTML into Editor
        */
-      tags: [ 'img' ],
+      tags: ['img'],
 
       /**
        * Paste URL of image into the Editor
        */
-      patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
-      },
+      patterns: { image: this.config.pattern },
 
       /**
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: [ 'image/*' ],
+        mimeTypes: ['image/*'],
       },
     };
   }
@@ -301,7 +306,10 @@ export default class ImageTool {
     this.ui.fillCaption(this._data.caption);
 
     Tunes.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== 'undefined' ? data[tune] === true || data[tune] === 'true' : false;
+      const value =
+        typeof data[tune] !== 'undefined'
+          ? data[tune] === true || data[tune] === 'true'
+          : false;
 
       this.setTune(tune, value);
     });
@@ -395,12 +403,13 @@ export default class ImageTool {
       /**
        * Wait until the API is ready
        */
-      Promise.resolve().then(() => {
-        const blockId = this.api.blocks.getCurrentBlockIndex();
+      Promise.resolve()
+        .then(() => {
+          const blockId = this.api.blocks.getCurrentBlockIndex();
 
-        this.api.blocks.stretchBlock(blockId, value);
-      })
-        .catch(err => {
+          this.api.blocks.stretchBlock(blockId, value);
+        })
+        .catch((err) => {
           console.error(err);
         });
     }
